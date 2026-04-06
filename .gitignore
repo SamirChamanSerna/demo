@@ -1,0 +1,73 @@
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/flutter_export_environment.sh
+/android/local.properties
+/windows/flutter/ephemeral/
+/macos/Flutter/ephemeral/
+/linux/flutter/ephemeral/
+/ios/Pods/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# .NET / C#
+[Bb]in/
+[Oo]bj/
+[Pp]ublish/
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# Native Binaries (Output)
+*.dll
+*.so
+*.dylib
+*.wasm
+*.exe
+*.pdb
+*.dat
+*.pqd
+
+# Project Specific Artefacts (Build Outputs)
+example/build/
+example/.dart_tool/
+example/.idea/
+
+# EXCEPCIONES: Runtime folders allowed for web demo
+# (El signo '!' obliga a Git a incluir estos archivos aunque estén ignorados arriba)
+# !web/dotnet_runtime/
+# !example/web/dotnet_runtime/
+# !web/dotnet_runtime/**/*.wasm
+# !web/dotnet_runtime/**/*.dat
+# !example/web/dotnet_runtime/**/*.wasm
+# !example/web/dotnet_runtime/**/*.dat
+
+# Documentation & AI Context (Requested to be ignored)
+GEMINI.md
+# Plan_de_Trabajo.md
+
+# Secrets
+.env
+.env.*
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Protobuf Generated (Optional)
+# Descomentar si no quieres versionar el código generado
+# src/generated/
