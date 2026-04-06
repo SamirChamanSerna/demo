@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Flutter + C# Wasm PoC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Estilos base para una carga suave -->
+  <style>
+    body { margin: 0; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
+    .loading { color: #555; }
+  </style>
+
+  <!-- El script loader.js se cargará dinámicamente desde Dart -->
+
+  <!-- Script base de Flutter -->
+  <script src="flutter.js" defer></script>
+</head>
+<body>
+  <div class="loading">Iniciando Aplicación...</div>
+
+  <script>
+    window.addEventListener('load', function(ev) {
+      // Inicialización estándar de Flutter Web
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          timeoutMillis: 4000,
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

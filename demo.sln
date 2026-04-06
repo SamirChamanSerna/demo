@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wasm_logic", "wasm_logic", "{75B13427-EFCD-A594-79CD-0874779039DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WasmLogic", "wasm_logic\WasmLogic.csproj", "{6C4FED76-BA32-6D19-9B69-43408E8A54B4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6C4FED76-BA32-6D19-9B69-43408E8A54B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C4FED76-BA32-6D19-9B69-43408E8A54B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C4FED76-BA32-6D19-9B69-43408E8A54B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C4FED76-BA32-6D19-9B69-43408E8A54B4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6C4FED76-BA32-6D19-9B69-43408E8A54B4} = {75B13427-EFCD-A594-79CD-0874779039DA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8BAEFE85-4001-4E9D-A7FC-230976D94BF9}
+	EndGlobalSection
+EndGlobal
