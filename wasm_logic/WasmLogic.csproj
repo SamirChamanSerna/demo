@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputType>Exe</OutputType>
     
     <!-- Configuración para NativeAOT (Windows/Android) -->
     <PublishAot Condition="'$(RuntimeIdentifier)' != 'browser-wasm'">true</PublishAot>
@@ -13,9 +14,17 @@
     <!-- Asegurar que se genere una librería compartida (.so) en Android -->
     <NativeLib Condition="'$(RuntimeIdentifier)' == 'android-arm64'">Shared</NativeLib>
     
+    <!-- Solución para el error de PrivateSdkAssemblies en Android NativeAOT -->
+    <_SuppressPrivateSdkAssembliesCheck Condition="'$(RuntimeIdentifier)' == 'android-arm64'">true</_SuppressPrivateSdkAssembliesCheck>
+    
     <!-- Configuración para WebAssembly -->
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>full</TrimMode>
+  </PropertyGroup>
+
+  <!-- Definiciones de preprocesador según el Runtime -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <DefineConstants>$(DefineConstants);WEB_WASM</DefineConstants>
   </PropertyGroup>
 
   <!-- Si compilamos para Wasm, necesitamos este paquete para [JSExport] -->
@@ -24,9 +33,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.*" PrivateAssets="all" />
   </ItemGroup>
 
-  <!-- Referencia explícita para NativeAOT en Android -->
-  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'android-arm64'">
-    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="8.0.*" />
-  </ItemGroup>
+  <!-- El compilador ILCompiler se incluye automáticamente con PublishAot=true -->
+  <!-- No es necesario referenciarlo explícitamente en la mayoría de los casos -->
 
 </Project>

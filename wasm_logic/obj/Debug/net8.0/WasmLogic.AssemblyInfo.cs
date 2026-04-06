@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WasmLogic")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+94799f7a394bad8fc282df2fb19cb0ea91861ffb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3b36c482eb1aebd5a2e8b5e4136026e5374896ae")]
 [assembly: System.Reflection.AssemblyProductAttribute("WasmLogic")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WasmLogic")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
