@@ -30,11 +30,34 @@ fi
 echo -e "${BLUE}>>> Ejecutando 'dotnet publish' para $RUNTIME_ID...${NC}"
 echo -e "${YELLOW}>>> (Esto puede tardar un momento debido a la optimización de NativeAOT)${NC}"
 
+# Si el NDK está instalado pero no en el PATH, intenta buscarlo en rutas comunes de WSL/Linux
+if [ -z "$ANDROID_NDK_ROOT" ] && [ -z "$AndroidNdkPath" ]; then
+    NDK_SEARCH_PATHS=(
+        "$HOME/Android/Sdk/ndk-bundle"
+        "$HOME/Android/Sdk/ndk/$(ls $HOME/Android/Sdk/ndk 2>/dev/null | sort -V | tail -n 1)"
+        "/usr/local/lib/android/sdk/ndk-bundle"
+        "/usr/lib/android-sdk/ndk-bundle"
+    )
+    for path in "${NDK_SEARCH_PATHS[@]}"; do
+        if [ -d "$path" ]; then
+            export AndroidNdkPath="$path"
+            echo -e "${YELLOW}>>> NDK encontrado en: $path${NC}"
+            break
+        fi
+    done
+fi
+
+if [ -z "$AndroidNdkPath" ] && [ -z "$ANDROID_NDK_ROOT" ]; then
+    echo -e "${RED}>>> ADVERTENCIA: No se encontró el Android NDK (ANDROID_NDK_ROOT).${NC}"
+    echo -e "${RED}>>> Es posible que el enlazado nativo falle si no está instalado.${NC}"
+fi
+
 dotnet publish "$PROJECT_DIR" \
     -c Release \
     -r "$RUNTIME_ID" \
     --self-contained true \
     -p:PublishAot=true \
+    -p:NativeLib=Shared \
     -o "$PROJECT_DIR/bin/publish-android"
 
 # Verificar si la compilación fue exitosa
