@@ -37,6 +37,8 @@
   <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-bionic-arm64' or '$(RuntimeIdentifier)' == 'android-arm64'">
     <!-- Android requiere que el SONAME en el ELF coincida exactamente con el nombre del archivo en disco -->
     <LinkerArg Include="-Wl,-soname,libWasmLogic.so" />
+    <!-- Solución para el error de ld.lld (Clang 16+) en Android: permite versiones indefinidas en el script de exportación -->
+    <LinkerArg Include="-Wl,--undefined-version" />
     <!-- Definición manual de PrivateSdkAssemblies para evitar errores en el enlazado nativo de Android -->
     <PrivateSdkAssemblies Include="$(TargetDir)*.dll" />
   </ItemGroup>
