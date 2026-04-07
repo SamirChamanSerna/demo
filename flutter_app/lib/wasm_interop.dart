@@ -1,9 +1,7 @@
 import 'dart:js_interop';
 import 'package:web/web.dart' as web;
 
-/**
- * wasm_interop.dart - Implementación WEB.
- */
+/// wasm_interop.dart - Implementación WEB.
 
 @JS('wasmBridge')
 external JSAny? get wasmBridge;

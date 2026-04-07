@@ -6,9 +6,7 @@ import 'package:flutter/services.dart';
 // Importación Condicional: El compilador elige el archivo correcto.
 import 'wasm_interop.dart' if (dart.library.io) 'native_interop.dart';
 
-/**
- * main.dart - Aplicación Multiplataforma Real (Híbrida).
- */
+/// main.dart - Aplicación Multiplataforma Real (Híbrida).
 
 void main() {
   runApp(const WasmApp());
@@ -104,9 +102,9 @@ class _WasmHomeState extends State<WasmHome> {
       children: [
         const Icon(Icons.devices, size: 80, color: Colors.indigo),
         const SizedBox(height: 24),
-        Text(
+        const Text(
           "PoC Multiplataforma: ${kIsWeb ? "Web" : "Native"}",
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),

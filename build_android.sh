@@ -17,7 +17,7 @@ echo -e "${BLUE}>>> Iniciando proceso de compilación para ANDROID (arm64-v8a)..
 # 1. Definir rutas
 PROJECT_DIR="./wasm_logic"
 FLUTTER_JNILIBS_DIR="./flutter_app/android/app/src/main/jniLibs/arm64-v8a"
-RUNTIME_ID="android-arm64"
+RUNTIME_ID="linux-bionic-arm64"
 OUTPUT_FILE="libWasmLogic.so"
 
 # Asegurar que el directorio de salida existe en Flutter
@@ -58,6 +58,7 @@ dotnet publish "$PROJECT_DIR" \
     --self-contained true \
     -p:PublishAot=true \
     -p:NativeLib=Shared \
+    -p:LinkerFlavor=lld \
     -o "$PROJECT_DIR/bin/publish-android"
 
 # Verificar si la compilación fue exitosa

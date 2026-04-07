@@ -5,35 +5,50 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     
-    <!-- Configuración para NativeAOT (Windows/Android) -->
+    <!-- Configuración para NativeAOT (General para Windows/Android) -->
     <PublishAot Condition="'$(RuntimeIdentifier)' != 'browser-wasm'">true</PublishAot>
     <IsAotCompatible>true</IsAotCompatible>
     
-    <!-- Asegurar que se genere una librería compartida (.so) en Android -->
-    <NativeLib Condition="'$(RuntimeIdentifier)' == 'android-arm64'">Shared</NativeLib>
-    
-    <!-- Solución para el error de PrivateSdkAssemblies en Android NativeAOT -->
-    <_SuppressPrivateSdkAssembliesCheck Condition="'$(RuntimeIdentifier)' == 'android-arm64'">true</_SuppressPrivateSdkAssembliesCheck>
+    <!-- Asegurar que se genere una librería compartida (.dll/.so) fuera de Wasm -->
+    <NativeLib Condition="'$(RuntimeIdentifier)' != 'browser-wasm'">Shared</NativeLib>
     
     <!-- Configuración para WebAssembly -->
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>full</TrimMode>
   </PropertyGroup>
 
-  <!-- Definiciones de preprocesador según el Runtime -->
+  <!-- Optimizaciones de Tamaño y Trimming (Directiva: Minimalismo Estricto) -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OptimizationPreference>Size</OptimizationPreference>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <IlcDisableReflection>true</IlcDisableReflection>
+    <StackTraceSupport>false</StackTraceSupport>
+  </PropertyGroup>
+
+  <!-- Configuración Específica para ANDROID / Linux (NativeAOT via Bionic) -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-bionic-arm64' or '$(RuntimeIdentifier)' == 'android-arm64'">
+    <PublishAotUsingRuntimePack>true</PublishAotUsingRuntimePack>
+    <!-- Solución para el error de PrivateSdkAssemblies en Android NativeAOT -->
+    <_SuppressPrivateSdkAssembliesCheck>true</_SuppressPrivateSdkAssembliesCheck>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-bionic-arm64' or '$(RuntimeIdentifier)' == 'android-arm64'">
+    <!-- Android requiere que el SONAME en el ELF coincida exactamente con el nombre del archivo en disco -->
+    <LinkerArg Include="-Wl,-soname,libWasmLogic.so" />
+    <!-- Definición manual de PrivateSdkAssemblies para evitar errores en el enlazado nativo de Android -->
+    <PrivateSdkAssemblies Include="$(TargetDir)*.dll" />
+  </ItemGroup>
+
+  <!-- Configuración para WebAssembly -->
   <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
     <DefineConstants>$(DefineConstants);WEB_WASM</DefineConstants>
   </PropertyGroup>
 
-  <!-- Si compilamos para Wasm, necesitamos este paquete para [JSExport] -->
   <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.*" PrivateAssets="all" />
   </ItemGroup>
-
-  <!-- El compilador ILCompiler se incluye automáticamente con PublishAot=true -->
-  <!-- No es necesario referenciarlo explícitamente en la mayoría de los casos -->
 
 </Project>

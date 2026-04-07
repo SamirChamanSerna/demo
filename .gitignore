@@ -71,3 +71,4 @@ GEMINI.md
 # Protobuf Generated (Optional)
 # Descomentar si no quieres versionar el código generado
 # src/generated/
+wasm_logic/obj/Debug/

@@ -1,9 +1,7 @@
 import 'dart:ffi';
 import 'dart:io';
 
-/**
- * native_interop.dart - Implementación NATIVA (Windows/Android).
- */
+/// native_interop.dart - Implementación NATIVA (Windows/Android).
 
 typedef SumarNativeFunc = Int32 Function(Int32 a, Int32 b);
 typedef SumarDartFunc = int Function(int a, int b);
