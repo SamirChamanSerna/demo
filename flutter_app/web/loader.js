@@ -10,6 +10,7 @@ async function initWasm() {
     // Configuración inicial del motor de .NET.
     const { getAssemblyExports, getConfig } = await dotnet
       .withDiagnosticTracing(false)
+      .withConfig({ disableIntegrityCheck: true })
       .create();
 
     const config = getConfig();

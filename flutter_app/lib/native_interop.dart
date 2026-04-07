@@ -18,9 +18,13 @@ class CalculatorService {
       try {
         _dylib = DynamicLibrary.open('libWasmLogic.so');
       } catch (e) {
-        // Fallback: Intentar buscar en la ubicación de librerías de la app instalada
-        print("Error al cargar libWasmLogic.so por nombre corto: $e");
-        _dylib = DynamicLibrary.open('libWasmLogic.so'); // Intento repetido para confirmación del log
+        print("FFI: Error cargando libWasmLogic.so, intentando fallback: $e");
+        try {
+          // A veces en Android el sistema prefiere el nombre sin prefijo/extensión para búsqueda en el path
+          _dylib = DynamicLibrary.open('WasmLogic');
+        } catch (e2) {
+          rethrow;
+        }
       }
     } else {
       throw UnsupportedError("Plataforma no soportada");

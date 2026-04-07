@@ -110,3 +110,8 @@ Ambas implementaciones exponen una clase `CalculatorService` con los mismos mét
 *   **DLL no encontrada**: En Windows, la DLL debe estar en `windows/libs/` o junto al `.exe`.
 *   **Error de Enlazado en Android**: Si obtienes errores de símbolos no definidos (`_init`, `_fini`), asegúrate de que el archivo `.csproj` incluya el flag `--undefined-version` para el enlazador.
 *   **Cross-OS Compilation**: Si intentas compilar para Android desde Windows, recibirás un error de .NET. Usa **WSL** para este paso específico.
+*   Una nota final: si el usuario está en Windows y usa un emulador, el emulador suele ser x86_64. El script compila para
+    arm64-v8a (linux-bionic-arm64). Esto significa que solo funcionará en dispositivos físicos arm64 o emuladores arm64.
+
+    Si el usuario quiere que funcione en el emulador estándar de Windows (x86_64), necesitaría compilar para
+    linux-bionic-x64.
