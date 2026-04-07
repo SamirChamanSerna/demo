@@ -15,7 +15,13 @@ class CalculatorService {
     if (Platform.isWindows) {
       _dylib = DynamicLibrary.open('WasmLogic.dll');
     } else if (Platform.isAndroid) {
-      _dylib = DynamicLibrary.open('libWasmLogic.so');
+      try {
+        _dylib = DynamicLibrary.open('libWasmLogic.so');
+      } catch (e) {
+        // Fallback: Intentar buscar en la ubicación de librerías de la app instalada
+        print("Error al cargar libWasmLogic.so por nombre corto: $e");
+        _dylib = DynamicLibrary.open('libWasmLogic.so'); // Intento repetido para confirmación del log
+      }
     } else {
       throw UnsupportedError("Plataforma no soportada");
     }
