@@ -1,3 +1,0 @@
-C:\Users\SCS\Documents\GitHub\Sigrama\demo\wasm_logic\bin\Release\net8.0\publish\WasmLogic.runtimeconfig.json
-C:\Users\SCS\Documents\GitHub\Sigrama\demo\wasm_logic\bin\Release\net8.0\publish\emcc-props.json
-C:\Users\SCS\Documents\GitHub\Sigrama\demo\wasm_logic\bin\Release\net8.0\publish\web.config

@@ -38,6 +38,31 @@ build/
 *.pdb
 *.dat
 *.pqd
+*.br
+*.gz
+_framework/
+
+# Flutter Web Wasm (Generated)
+flutter_app/web/*.deps.json
+flutter_app/web/*.runtimeconfig.json
+flutter_app/web/blazor.boot.json
+flutter_app/web/*.c
+flutter_app/web/*.h
+flutter_app/web/*.d.ts
+flutter_app/web/*.js.map
+flutter_app/web/*.js.symbols
+flutter_app/web/*.a
+flutter_app/web/dotnet*.js
+flutter_app/web/WasmLogic.wasm
+flutter_app/web/System.*.wasm
+flutter_app/web/*.rsp
+flutter_app/web/package.json
+flutter_app/web/pal_random.lib.js
+
+# Windows Native Libs (Generated)
+flutter_app/windows/libs/*.dll
+flutter_app/windows/libs/*.pdb
+
 
 # Project Specific Artefacts (Build Outputs)
 example/build/
@@ -71,4 +96,5 @@ GEMINI.md
 # Protobuf Generated (Optional)
 # Descomentar si no quieres versionar el código generado
 # src/generated/
-wasm_logic/obj/Debug/
+wasm_logic/obj/
+wasm_logic/bin/

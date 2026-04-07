@@ -11,7 +11,7 @@ Esta prueba de concepto demuestra cómo compartir lógica de negocio escrita en 
     dotnet workload install wasm-tools
     ```
 2.  **Flutter SDK (3.19.0 o superior)**: Soporte para `extension type`.
-3.  **Android NDK**: Necesario para compilar librerías de Android.
+3.  **Android NDK**: Necesario para compilar librerías de Android. Asegúrate de tener configurada la variable `ANDROID_NDK_ROOT` o que el NDK esté en las rutas estándar.
 
 ---
 
@@ -24,8 +24,8 @@ cd wasm_logic
 dotnet publish -r browser-wasm -c Release -p:DefineConstants=WEB_WASM
 
 # 2. Mover archivos al proyecto Flutter
-# Nota: La ruta de salida puede variar, buscar en bin\Release\net8.0\browser-wasm\publish\wwwroot\_framework
-copy bin\Release\net8.0\browser-wasm\publish\wwwroot\_framework\* ..\flutter_app\web\
+# Los archivos generados se encuentran en bin\Release\net8.0\browser-wasm\publish\
+copy bin\Release\net8.0\browser-wasm\publish\* ..\flutter_app\web\
 copy ..\web_bridge\loader.js ..\flutter_app\web\
 ```
 
@@ -46,6 +46,7 @@ cd wasm_logic
 dotnet publish -r win-x64 -c Release
 
 # 2. Mover DLL a la carpeta de librerías de Flutter Windows
+# La DLL se genera en bin\Release\net8.0\win-x64\publish\WasmLogic.dll
 copy bin\Release\net8.0\win-x64\publish\WasmLogic.dll ..\flutter_app\windows\libs\
 ```
 
@@ -60,16 +61,27 @@ flutter run -d windows --release
 ## 4. Ejecución en Android (Nativo)
 
 > [!IMPORTANT]
-> **Limitación de Compilación Cruzada:** La compilación nativa para Android (`NativeAOT`) requiere un sistema operativo basado en **Linux** (como WSL o Ubuntu) para generar el archivo `.so`. .NET en Windows no soporta el enlazado nativo para objetivos Linux/Android.
+> **Requerimiento de Linux/WSL:** La compilación nativa para Android (`NativeAOT`) requiere un sistema operativo basado en **Linux** (como WSL o Ubuntu) para realizar el enlazado nativo.
 
-### Compilación y Preparación (Desde WSL/Linux)
+### Compilación Automatizada (Recomendado)
+Se ha incluido un script bash que automatiza todo el proceso (compilación y copia de archivos):
+
+```bash
+# Desde WSL o Linux en la raíz del proyecto:
+chmod +x build_android.sh
+./build_android.sh
+```
+
+### Compilación Manual (Desde WSL/Linux)
+Si prefieres hacerlo manualmente:
 ```bash
 # 1. Compilar C# para Android (Arm64)
 cd wasm_logic
-dotnet publish -r android-arm64 -c Release
+dotnet publish -r linux-bionic-arm64 -c Release -p:PublishAot=true -p:NativeLib=Shared
 
-# 2. Mover librería .so a la carpeta JNI de Android en Windows
-cp bin/Release/net8.0/android-arm64/publish/libWasmLogic.so /mnt/c/ruta/a/flutter_app/android/app/src/main/jniLibs/arm64-v8a/
+# 2. Mover librería .so a la carpeta JNI de Flutter
+# El archivo se genera en bin/Release/net8.0/linux-bionic-arm64/publish/libWasmLogic.so
+cp bin/Release/net8.0/linux-bionic-arm64/publish/libWasmLogic.so ../flutter_app/android/app/src/main/jniLibs/arm64-v8a/
 ```
 
 ### Lanzamiento (Desde Windows)
@@ -96,4 +108,5 @@ Ambas implementaciones exponen una clase `CalculatorService` con los mismos mét
 
 *   **Error MIME en Web**: El servidor debe responder con `Content-Type: application/wasm`.
 *   **DLL no encontrada**: En Windows, la DLL debe estar en `windows/libs/` o junto al `.exe`.
+*   **Error de Enlazado en Android**: Si obtienes errores de símbolos no definidos (`_init`, `_fini`), asegúrate de que el archivo `.csproj` incluya el flag `--undefined-version` para el enlazador.
 *   **Cross-OS Compilation**: Si intentas compilar para Android desde Windows, recibirás un error de .NET. Usa **WSL** para este paso específico.

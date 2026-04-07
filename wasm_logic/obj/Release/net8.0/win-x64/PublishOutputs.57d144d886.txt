@@ -1,2 +1,0 @@
-C:\Users\SCS\Documents\GitHub\Sigrama\demo\wasm_logic\bin\Release\net8.0\win-x64\publish\WasmLogic.dll
-C:\Users\SCS\Documents\GitHub\Sigrama\demo\wasm_logic\bin\Release\net8.0\win-x64\publish\WasmLogic.pdb
