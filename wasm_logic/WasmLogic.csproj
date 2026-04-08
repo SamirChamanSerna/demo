@@ -20,9 +20,12 @@
     <!-- Para WASM usamos el motor Mono AOT -->
     <RunAOTCompilation Condition="'$(IsWasm)' == 'true'">true</RunAOTCompilation>
     
-    <!-- OutputType: Exe para WASM (requerido por el SDK), Library para el resto -->
+    <!-- OutputType: Exe para WASM, Library para el resto -->
     <OutputType Condition="'$(IsWasm)' == 'true'">Exe</OutputType>
     <OutputType Condition="'$(IsWasm)' != 'true'">Library</OutputType>
+
+    <!-- Definición de Constantes (Movido a PropertyGroup para evitar error MSB4232) -->
+    <DefineConstants Condition="'$(IsWasm)' == 'true'">$(DefineConstants);WEB_WASM</DefineConstants>
   </PropertyGroup>
 
   <!-- 3. OPTIMIZACIONES GLOBALES (Release) -->
@@ -32,19 +35,16 @@
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>full</TrimMode>
     <StackTraceSupport>false</StackTraceSupport>
-    <!-- NativeAOT: Desactivar reflexión para minimizar tamaño -->
     <IlcDisableReflection Condition="'$(IsWasm)' != 'true'">true</IlcDisableReflection>
   </PropertyGroup>
 
   <!-- 4. CONFIGURACIÓN ESPECÍFICA PARA ANDROID (NativeAOT via Bionic) -->
-  <!-- Incluye ARM64 (Dispositivo) y x64 (Emulador) -->
   <PropertyGroup Condition="'$(IsAndroidAot)' == 'true'">
     <PublishAotUsingRuntimePack>true</PublishAotUsingRuntimePack>
     <_SuppressPrivateSdkAssembliesCheck>true</_SuppressPrivateSdkAssembliesCheck>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(IsAndroidAot)' == 'true'">
-    <!-- El nombre del archivo interno (soname) debe ser igual al nombre del archivo físico -->
     <LinkerArg Include="-Wl,-soname,libWasmLogic.so" />
     <LinkerArg Include="-Wl,--undefined-version" />
   </ItemGroup>
@@ -53,7 +53,6 @@
   <ItemGroup Condition="'$(IsWasm)' == 'true'">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.*" PrivateAssets="all" />
-    <DefineConstants>$(DefineConstants);WEB_WASM</DefineConstants>
   </ItemGroup>
 
 </Project>

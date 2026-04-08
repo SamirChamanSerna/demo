@@ -31,8 +31,14 @@ dotnet publish -r browser-wasm -c Release
 ```
 
 ### Preparación y Lanzamiento
-1. Copia los archivos `.wasm` generados a la carpeta `web/` de tu proyecto Flutter.
-2. Copia el archivo `loader.js` (si posees uno personalizado) a la misma carpeta.
+1. Copia los archivos generados a la carpeta `_framework` de Flutter:
+   ```bash
+   cp bin/Release/net8.0/browser-wasm/publish/* ../flutter_app/web/_framework/
+   ```
+2. Asegúrate de que el `loader.js` esté en la raíz de `web/`:
+   ```bash
+   cp ../web_bridge/loader.js ../flutter_app/web/
+   ```
 3. Ejecuta Flutter:
    ```bash
    cd ../flutter_app
@@ -52,9 +58,11 @@ dotnet publish -r win-x64 -c Release
 ```
 
 ### Preparación
-1. Localiza el archivo `WasmLogic.dll` en `bin/Release/net8.0/win-x64/publish/`.
-2. Cópialo a `flutter_app/windows/libs/`.
-3. Ejecuta Flutter:
+1. Copia el archivo `WasmLogic.dll` (el de ~700KB+) a la carpeta de librerías de Flutter:
+   ```bash
+   cp bin/Release/net8.0/win-x64/publish/WasmLogic.dll ../flutter_app/windows/libs/
+   ```
+2. Ejecuta Flutter:
    ```bash
    cd ../flutter_app
    flutter run -d windows --release
