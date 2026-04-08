@@ -5,52 +5,55 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <OutputType>Library</OutputType>
+
+    <!-- 1. DETECCIÓN DE PLATAFORMA -->
+    <IsWasm Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">true</IsWasm>
+    <IsAndroidAot Condition="'$(RuntimeIdentifier)' == 'android-arm64' or '$(RuntimeIdentifier)' == 'linux-bionic-arm64' or '$(RuntimeIdentifier)' == 'linux-bionic-x64'">true</IsAndroidAot>
+    <IsWindowsAot Condition="$(RuntimeIdentifier.StartsWith('win-'))">true</IsWindowsAot>
+
+    <!-- 2. CONFIGURACIÓN DE SALIDA (Librería Nativa vs WASM) -->
+    <PublishAot Condition="'$(IsWasm)' != 'true'">true</PublishAot>
     
-    <!-- Configuración para NativeAOT (General para Windows/Android) -->
-    <PublishAot Condition="'$(RuntimeIdentifier)' != 'browser-wasm'">true</PublishAot>
-    <IsAotCompatible>true</IsAotCompatible>
+    <!-- Para Android y Windows generamos una librería compartida (.so / .dll) -->
+    <NativeLib Condition="'$(IsAndroidAot)' == 'true' or '$(IsWindowsAot)' == 'true'">Shared</NativeLib>
     
-    <!-- Asegurar que se genere una librería compartida (.dll/.so) fuera de Wasm -->
-    <NativeLib Condition="'$(RuntimeIdentifier)' != 'browser-wasm'">Shared</NativeLib>
+    <!-- Para WASM usamos el motor Mono AOT -->
+    <RunAOTCompilation Condition="'$(IsWasm)' == 'true'">true</RunAOTCompilation>
     
-    <!-- Configuración para WebAssembly -->
-    <PublishTrimmed>true</PublishTrimmed>
-    <TrimMode>full</TrimMode>
+    <!-- OutputType: Exe para WASM (requerido por el SDK), Library para el resto -->
+    <OutputType Condition="'$(IsWasm)' == 'true'">Exe</OutputType>
+    <OutputType Condition="'$(IsWasm)' != 'true'">Library</OutputType>
   </PropertyGroup>
 
-  <!-- Optimizaciones de Tamaño y Trimming (Directiva: Minimalismo Estricto) -->
+  <!-- 3. OPTIMIZACIONES GLOBALES (Release) -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <OptimizationPreference>Size</OptimizationPreference>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <IlcDisableReflection>true</IlcDisableReflection>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>full</TrimMode>
     <StackTraceSupport>false</StackTraceSupport>
+    <!-- NativeAOT: Desactivar reflexión para minimizar tamaño -->
+    <IlcDisableReflection Condition="'$(IsWasm)' != 'true'">true</IlcDisableReflection>
   </PropertyGroup>
 
-  <!-- Configuración Específica para ANDROID / Linux (NativeAOT via Bionic) -->
-  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-bionic-arm64' or '$(RuntimeIdentifier)' == 'android-arm64'">
+  <!-- 4. CONFIGURACIÓN ESPECÍFICA PARA ANDROID (NativeAOT via Bionic) -->
+  <!-- Incluye ARM64 (Dispositivo) y x64 (Emulador) -->
+  <PropertyGroup Condition="'$(IsAndroidAot)' == 'true'">
     <PublishAotUsingRuntimePack>true</PublishAotUsingRuntimePack>
-    <!-- Solución para el error de PrivateSdkAssemblies en Android NativeAOT -->
     <_SuppressPrivateSdkAssembliesCheck>true</_SuppressPrivateSdkAssembliesCheck>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-bionic-arm64' or '$(RuntimeIdentifier)' == 'android-arm64'">
-    <!-- Android requiere que el SONAME en el ELF coincida exactamente con el nombre del archivo en disco -->
+  <ItemGroup Condition="'$(IsAndroidAot)' == 'true'">
+    <!-- El nombre del archivo interno (soname) debe ser igual al nombre del archivo físico -->
     <LinkerArg Include="-Wl,-soname,libWasmLogic.so" />
-    <!-- Solución para el error de ld.lld (Clang 16+) en Android: permite versiones indefinidas en el script de exportación -->
     <LinkerArg Include="-Wl,--undefined-version" />
-    <!-- Definición manual de PrivateSdkAssemblies para evitar errores en el enlazado nativo de Android -->
-    <PrivateSdkAssemblies Include="$(TargetDir)*.dll" />
   </ItemGroup>
 
-  <!-- Configuración para WebAssembly -->
-  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
-    <DefineConstants>$(DefineConstants);WEB_WASM</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+  <!-- 5. CONFIGURACIÓN ESPECÍFICA PARA WEB ASSEMBLY -->
+  <ItemGroup Condition="'$(IsWasm)' == 'true'">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.*" PrivateAssets="all" />
+    <DefineConstants>$(DefineConstants);WEB_WASM</DefineConstants>
   </ItemGroup>
 
 </Project>
