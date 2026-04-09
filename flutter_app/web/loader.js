@@ -10,6 +10,10 @@ async function initWasm() {
   try {
     // Configuración inicial del motor de .NET.
     const { getAssemblyExports, getConfig } = await dotnet
+      .withConfig({
+        loadConfigFrom: '_framework/blazor.boot.json',
+        disableIntegrityCheck: true
+      })
       .withDiagnosticTracing(false)
       .create();
 

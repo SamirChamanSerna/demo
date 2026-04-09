@@ -8,118 +8,72 @@ Esta prueba de concepto demuestra cómo compartir lógica de negocio escrita en 
 
 1.  **.NET 8 SDK** instalado.
 2.  **Cargas de trabajo WASM**:
-    ```bash
+    ```powershell
     dotnet workload install wasm-tools
     ```
 3.  **Flutter SDK (3.19.0 o superior)**.
-4.  **Android NDK**: Necesario para compilar librerías de Android. 
-    *   En Linux/WSL, asegúrate de tener instalada una versión del NDK (ej. 25.x o 26.x).
-5.  **WSL (Windows Subsystem for Linux)**: Requerido para compilar las librerías de Android desde Windows.
+4.  **Android NDK**: Necesario para compilar librerías de Android.
+5.  **WSL (Windows Subsystem for Linux)**: Requerido para compilar las librerías de Android desde Windows (usando el script `.sh`).
 
 ---
 
-## 2. Ejecución en la Web (Wasm)
+## 2. Automatización de Compilación (Recomendado)
 
-El archivo `.csproj` detecta automáticamente la plataforma y aplica las optimizaciones de tamaño.
+He incluido scripts de PowerShell para simplificar el proceso de limpieza, compilación y despliegue de binarios.
 
-### Compilación
-```bash
-cd wasm_logic
-dotnet publish -r browser-wasm -c Release
-
-# Los archivos generados están en: bin/Release/net8.0/browser-wasm/publish/wwwroot/_framework/
+### 🌐 Web (Wasm)
+Desde la raíz del proyecto, ejecuta:
+```powershell
+.\build_web.ps1
 ```
+*Este script limpia los binarios previos, compila para `browser-wasm`, sincroniza el `_framework` y el `loader.js` en la carpeta `flutter_app/web/`.*
 
-### Preparación y Lanzamiento
-1. Copia los archivos generados a la carpeta `_framework` de Flutter:
-   ```bash
-   cp bin/Release/net8.0/browser-wasm/publish/* ../flutter_app/web/_framework/
-   ```
-2. Asegúrate de que el `loader.js` esté en la raíz de `web/`:
-   ```bash
-   cp ../web_bridge/loader.js ../flutter_app/web/
-   ```
-3. Ejecuta Flutter:
-   ```bash
-   cd ../flutter_app
-   flutter run -d chrome --release
-   ```
-
----
-
-## 3. Ejecución en Windows (NativeAOT)
-
-Genera una DLL nativa que no requiere el runtime de .NET instalado en la máquina destino.
-
-### Compilación
-```bash
-cd wasm_logic
-dotnet publish -r win-x64 -c Release
+### 🪟 Windows (NativeAOT)
+Desde la raíz del proyecto, ejecuta:
+```powershell
+.\build_windows.ps1
 ```
+*Este script compila la lógica en una DLL nativa y la coloca en `flutter_app/windows/libs/`.*
 
-### Preparación
-1. Copia el archivo `WasmLogic.dll` (el de ~700KB+) a la carpeta de librerías de Flutter:
-   ```bash
-   cp bin/Release/net8.0/win-x64/publish/WasmLogic.dll ../flutter_app/windows/libs/
-   ```
-2. Ejecuta Flutter:
-   ```bash
-   cd ../flutter_app
-   flutter run -d windows --release
-   ```
-
----
-
-## 4. Ejecución en Android (NativeAOT)
-
-> [!IMPORTANT]
-> **WSL Requerido:** La compilación para Android debe realizarse en un entorno Linux (WSL es suficiente) debido a que el enlazador nativo de .NET para Android usa bibliotecas de Bionic/Linux.
-
-### Compilación Automatizada (Recomendado)
-El script `build_android.sh` detecta el NDK automáticamente, compila y mueve los archivos a la carpeta correcta de Flutter.
-
-**Para Dispositivo Físico (ARM64):**
+### 🤖 Android (NativeAOT)
+Requiere WSL. Desde una terminal Linux/WSL:
 ```bash
 chmod +x build_android.sh
-./build_android.sh arm64
+./build_android.sh arm64  # Para dispositivos reales
+./build_android.sh x64    # Para emuladores
 ```
 
-**Para Emulador de Android en Windows (x86_64):**
+---
+
+## 3. Estructura de Carpetas y Binarios
+
+| Plataforma | Origen de Compilación (.NET) | Destino en Flutter |
+| :--- | :--- | :--- |
+| **Web** | `wasm_logic/.../AppBundle/_framework/` | `flutter_app/web/_framework/` |
+| **Windows** | `wasm_logic/.../win-x64/publish/WasmLogic.dll` | `flutter_app/windows/libs/` |
+| **Android** | `wasm_logic/.../publish-android-*/libWasmLogic.so` | `flutter_app/android/app/src/main/jniLibs/` |
+
+---
+
+## 4. Ejecución de la App Flutter
+
+Una vez que los binarios están sincronizados:
+
 ```bash
-./build_android.sh x64
-```
-
-### Compilación Manual
-Si deseas compilar manualmente desde la terminal de WSL:
-```bash
-# Android ARM64
-dotnet publish -r linux-bionic-arm64 -c Release
-
-# Android x64 (Emulador)
-dotnet publish -r linux-bionic-x64 -c Release
+cd flutter_app
+# Para Web
+flutter run -d chrome --release
+# Para Windows
+flutter run -d windows --release
+# Para Android
+flutter run -d <device_id> --release
 ```
 
 ---
 
-## 5. Tabla de Arquitecturas soportadas
+## 5. Notas Técnicas y Resolución de Problemas
 
-| Plataforma | Runtime Identifier (RID) | Salida | Destino en Flutter |
-| :--- | :--- | :--- | :--- |
-| **Web** | `browser-wasm` | `.wasm` | `web/` |
-| **Windows** | `win-x64` | `.dll` | `windows/libs/` |
-| **Android (Físico)** | `linux-bionic-arm64` | `libWasmLogic.so` | `jniLibs/arm64-v8a/` |
-| **Android (Emulador)**| `linux-bionic-x64` | `libWasmLogic.so` | `jniLibs/x86_64/` |
-
----
-
-## 6. Notas Técnicas y Resolución de Problemas
-
-*   **Error `PrivateSdkAssemblies`**: Este error suele ocurrir si intentas usar `PublishAot` en WebAssembly. El `.csproj` actual corrige esto desactivando `PublishAot` automáticamente cuando el target es `browser-wasm`.
-*   **Compatibilidad de Emulador**: Los emuladores estándar de Android en Windows corren sobre arquitectura **x86_64**. No intentes cargar la librería `arm64` en el emulador, ya que Flutter lanzará un error de "Invalid ELF header" o simplemente no encontrará la librería.
-*   **Android NDK**: Si el script no encuentra el NDK, exporta la ruta manualmente en tu terminal de WSL:
-    ```bash
-    export ANDROID_NDK_ROOT=/ruta/a/tu/android-sdk/ndk/version
-    ```
-*   **Trimming**: Se ha configurado `TrimMode=full` para reducir drásticamente el tamaño de los binarios. Si usas librerías externas que dependan de mucha reflexión, podrías necesitar añadir un archivo `TrimmerDescriptor`.
-
----
+*   **Integridad SRI (Web)**: Si realizas cambios en C# y los copias manualmente, podrías ver errores de "Integrity check failed". El script `build_web.ps1` ayuda a mantener la consistencia, y el `loader.js` está configurado con `disableIntegrityCheck: true` para evitar bloqueos del navegador.
+*   **Archivos de Soporte (Web)**: Asegúrate de que la carpeta `_framework/supportFiles` se copie íntegramente, ya que contiene el archivo `0_runtimeconfig.bin` necesario para el inicio del runtime.
+*   **Arquitecturas de Android**: Los emuladores de Android en Windows usan **x86_64**. Asegúrate de compilar con `./build_android.sh x64` para probar en el emulador.
+*   **Trimming**: Se usa `TrimMode=full`. Si añades librerías externas que fallen al ejecutar (pero no al compilar), es probable que necesites configurar excepciones de recortes en el `.csproj`.
