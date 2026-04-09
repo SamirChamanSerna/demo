@@ -50,6 +50,13 @@
   </ItemGroup>
 
   <!-- 5. CONFIGURACIÓN ESPECÍFICA PARA WEB ASSEMBLY -->
+  <PropertyGroup Condition="'$(IsWasm)' == 'true'">
+    <WasmFingerprintAssets>false</WasmFingerprintAssets>
+    <StaticWebAssetFingerprintingEnabled>false</StaticWebAssetFingerprintingEnabled>
+    <BlazorEnableCompression>false</BlazorEnableCompression>
+    <BlazorCacheBootResources>false</BlazorCacheBootResources>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(IsWasm)' == 'true'">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.*" PrivateAssets="all" />
